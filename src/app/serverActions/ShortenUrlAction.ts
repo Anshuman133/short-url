@@ -4,11 +4,26 @@ import { UrlShortenerService } from "@/services/UrlShortenerService";
 import { revalidatePath } from "next/cache";
 
 const shortenURL = async (formData: FormData) => {
-    const originalUrl : string = formData.get('originalUrl') as string;
-    console.log("Oriignal URL Passed is ", originalUrl);
-    const shortenerService = new UrlShortenerService();
-    const shortUrl = await shortenerService.shortenUrl(originalUrl);
-    revalidatePath('/urls');
+    const originalUrl: string = formData.get('originalUrl') as string;
+    console.log("Original URL Passed is ", originalUrl);
 
-}
-export default shortenURL
+    try {
+        const shortenerService = new UrlShortenerService();
+        const shortUrl = await shortenerService.shortenUrl(originalUrl);
+
+        revalidatePath('/urls');
+
+        return {
+            success: true,
+            shortUrl: shortUrl
+        };
+    } catch (error) {
+        console.error("Error shortening URL:", error);
+        return {
+            success: false,
+            errorMessage: "An error occurred while shortening the URL."
+        };
+    }
+};
+
+export default shortenURL;
